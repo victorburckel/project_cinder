@@ -131,6 +131,7 @@
     <None Include="base.props" />
     <None Include="boost.props" />
     <None Include="cinder.props" />
+    <None Include="resources\walking.json" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Resources.h" />
@@ -139,7 +140,7 @@
     <ResourceCompile Include="project_cinder.rc" />
   </ItemGroup>
   <ItemGroup>
-    <Image Include="resources\walking.tunic.png" />
+    <Image Include="resources\walking.png" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
