@@ -97,6 +97,7 @@
       <Optimization>Disabled</Optimization>
       <SDLCheck>true</SDLCheck>
     </ClCompile>
+    <Link />
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <ClCompile>
@@ -131,7 +132,9 @@
     <None Include="base.props" />
     <None Include="boost.props" />
     <None Include="cinder.props" />
-    <None Include="resources\walking.json" />
+    <None Include="resources\animations\walking.json" />
+    <None Include="resources\shaders\instanced.frag" />
+    <None Include="resources\shaders\instanced.vert" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Resources.h" />
@@ -140,7 +143,7 @@
     <ResourceCompile Include="project_cinder.rc" />
   </ItemGroup>
   <ItemGroup>
-    <Image Include="resources\walking.png" />
+    <Image Include="resources\tilesets\walking.png" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

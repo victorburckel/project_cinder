@@ -1,25 +1,30 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup>
-    <Filter Include="Fichiers sources">
-      <UniqueIdentifier>{4FC737F1-C7A5-4376-A066-2A32D752A2FF}</UniqueIdentifier>
-      <Extensions>cpp;c;cc;cxx;def;odl;idl;hpj;bat;asm;asmx</Extensions>
+    <Filter Include="build">
+      <UniqueIdentifier>{6a735b87-f2b4-4491-bbd0-f44bde4c6564}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Fichiers d%27en-tête">
-      <UniqueIdentifier>{93995380-89BD-4b04-88EB-625FBE52EBFB}</UniqueIdentifier>
-      <Extensions>h;hh;hpp;hxx;hm;inl;inc;xsd</Extensions>
-    </Filter>
-    <Filter Include="Fichiers de ressources">
+    <Filter Include="resources">
       <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
       <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
     </Filter>
-    <Filter Include="build">
-      <UniqueIdentifier>{6a735b87-f2b4-4491-bbd0-f44bde4c6564}</UniqueIdentifier>
+    <Filter Include="resources\shaders">
+      <UniqueIdentifier>{a6a1da95-dde8-4476-8f2a-4f964c131728}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="resources\animations">
+      <UniqueIdentifier>{fff7e116-48d3-40ab-8978-c12983b72f9c}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="resources\tilesets">
+      <UniqueIdentifier>{0806883d-c89f-4cff-9ec6-690d104c1bb6}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="sources">
+      <UniqueIdentifier>{4FC737F1-C7A5-4376-A066-2A32D752A2FF}</UniqueIdentifier>
+      <Extensions>cpp;c;cc;cxx;def;odl;idl;hpj;bat;asm;asmx</Extensions>
     </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="CinderApp.cpp">
-      <Filter>Fichiers sources</Filter>
+      <Filter>sources</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -32,23 +37,29 @@
     <None Include="base.props">
       <Filter>build</Filter>
     </None>
-    <None Include="resources\walking.json">
-      <Filter>Fichiers de ressources</Filter>
+    <None Include="resources\animations\walking.json">
+      <Filter>resources\animations</Filter>
+    </None>
+    <None Include="resources\shaders\instanced.frag">
+      <Filter>resources\shaders</Filter>
+    </None>
+    <None Include="resources\shaders\instanced.vert">
+      <Filter>resources\shaders</Filter>
     </None>
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="project_cinder.rc">
-      <Filter>Fichiers de ressources</Filter>
+      <Filter>resources</Filter>
     </ResourceCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Resources.h">
-      <Filter>Fichiers sources</Filter>
+      <Filter>sources</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
-    <Image Include="resources\walking.png">
-      <Filter>Fichiers de ressources</Filter>
+    <Image Include="resources\tilesets\walking.png">
+      <Filter>resources\tilesets</Filter>
     </Image>
   </ItemGroup>
 </Project>
