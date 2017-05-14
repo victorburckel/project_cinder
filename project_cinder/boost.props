@@ -5,10 +5,10 @@
   <PropertyGroup />
   <ItemDefinitionGroup>
     <ClCompile>
-      <AdditionalIncludeDirectories>..\..\boost_1_61_0</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>..\..\boost_1_64_0</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
-      <AdditionalLibraryDirectories>..\..\boost_1_61_0\lib\$(Platform)</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>..\..\boost_1_64_0\lib\$(Platform)</AdditionalLibraryDirectories>
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup />
