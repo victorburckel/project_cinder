@@ -20,13 +20,22 @@ namespace{
 struct InstanceData
 {
 	ci::vec2 position;
-	int imageIndex;
+	ci::vec4 textCoords;
 };
 
 struct Animation
 {
+	struct Frame
+	{
+		uint32_t lastFrame;
+		float x;
+		float y;
+		float frame_width;
+		float frame_height;
+	};
+
 	std::string name;
-	std::vector< ci::vec4 > frames;
+	std::vector< Frame > frames;
 };
 
 Animation loadAnimation( int32_t imageWidth, int32_t imageHeight )
@@ -42,7 +51,8 @@ Animation loadAnimation( int32_t imageWidth, int32_t imageHeight )
 	const auto animation = decoded.get_child( "animation" );
 
 	const auto frames = animation.get_child( "directions" ) | boost::adaptors::transformed( [ imageWidth, imageHeight ]( const auto& element ){
-		return ci::vec4{
+		return Animation::Frame{
+			element.second.get< uint32_t >( "num_frames" ),
 			element.second.get< float >( "x" ) / imageWidth,
 			1 - ( element.second.get< float >( "y" ) + element.second.get< float >( "frame_height" ) ) / imageHeight, 
 			element.second.get< float >( "frame_width" ) / imageWidth,
@@ -60,7 +70,7 @@ class CinderApp : public ci::app::App
 		try
 		{
 			_params = { "Parameters", ci::vec2( 200, 50 ) };
-			_params.addParam( "Sprites", &_instances ).min( 1.f ).max( static_cast< float >( maxInstances ) );
+			_params.addParam( "Sprites", &_instances ).min( 1 ).max( maxInstances );
 			_params.addParam( "Fps", &_averageFps, true );
 
 			const auto image = loadImage( loadResource( HERO_WALKING_IMG ) );
@@ -73,17 +83,17 @@ class CinderApp : public ci::app::App
 			ci::geom::BufferLayout instanceDataLayout;
 
 			instanceDataLayout.append( ci::geom::Attrib::CUSTOM_0, 2, sizeof( InstanceData ), offsetof( InstanceData, position ), 1 );
-			instanceDataLayout.append( ci::geom::Attrib::CUSTOM_1, 1, sizeof( InstanceData ), offsetof( InstanceData, imageIndex ), 1 );
+			instanceDataLayout.append( ci::geom::Attrib::CUSTOM_1, 4, sizeof( InstanceData ), offsetof( InstanceData, textCoords ), 1 );
 
 			const auto mesh = ci::gl::VboMesh::create( ci::geom::Rect( ci::Rectf( -37.5f, -50.f, 37.5f, 50.f ) ) );
 			mesh->appendVbo( instanceDataLayout, _instancesData );
 
 			ci::gl::Batch::AttributeMapping mapping;
 			mapping[ ci::geom::Attrib::CUSTOM_0 ] = "aInstancePosition";
-			mapping[ ci::geom::Attrib::CUSTOM_1 ] = "aInstanceImageIndex";
+			mapping[ ci::geom::Attrib::CUSTOM_1 ] = "aInstanceTextCoords";
 
-			_shader = ci::gl::GlslProg::create( loadResource( VERTEX_SHADER ), loadResource( FRAMGENT_SHADER ) );
-			_batch = ci::gl::Batch::create( mesh, _shader, mapping );
+			const auto shader = ci::gl::GlslProg::create( loadResource( VERTEX_SHADER ), loadResource( FRAMGENT_SHADER ) );
+			_batch = ci::gl::Batch::create( mesh, shader, mapping );
 		}
 		catch( const std::exception &e )
 		{
@@ -98,7 +108,7 @@ class CinderApp : public ci::app::App
 
 		const auto instancesData = static_cast< InstanceData* >( _instancesData->mapReplace() );
 		for( auto& instanceData : boost::make_iterator_range( instancesData, instancesData + _instances ) )
-			instanceData.imageIndex = ( getElapsedFrames() / 8 ) % 4;
+			instanceData.textCoords = { frame.x, frame.y, frame.frame_width, frame.frame_height };
 		_instancesData->unmap();
 		_averageFps = getAverageFps();
 	}
@@ -108,7 +118,6 @@ class CinderApp : public ci::app::App
 		ci::gl::clear( ci::Color( 0.2f, 0.3f, 0.3f ) );
 		
 		{
-			_shader->uniform( "uImageCoords", _animation.frames.data(), static_cast< int >( _animation.frames.size() ) );
 			ci::gl::ScopedTextureBind texture( _texture );
 			ci::gl::ScopedModelMatrix scpMtx;
 			ci::gl::translate( getWindowCenter() ),
@@ -119,12 +128,11 @@ class CinderApp : public ci::app::App
 	}
 
 	ci::gl::Texture2dRef _texture;
-	ci::gl::GlslProgRef _shader;
 	ci::gl::VboRef _instancesData;
 	ci::gl::BatchRef _batch;
 	Animation _animation;
 	ci::params::InterfaceGl _params;
-	int _instances = 5000;
+	int _instances = 1000;
 	float _averageFps = 0.;
 	const int maxInstances = 10000;
 };
