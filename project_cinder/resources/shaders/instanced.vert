@@ -1,21 +1,24 @@
 #version 150
 
-uniform mat4	ciModelViewProjection;
+uniform mat4 ciModelViewProjection;
 
-in vec4			ciPosition;
-in vec2			ciTexCoord0;
+uniform vec4[4] uImageCoords;
 
-in vec2			aInstancePosition;
-in vec4         aInstanceTextCoords;
+in vec4 ciPosition;
+in vec2 ciTexCoord0;
 
-out vec2		textCoords;
+in vec2 aInstancePosition;
+in int aInstanceImageIndex;
+
+out vec2 textCoords;
 
 void main()
 {
 	vec4 position = ciPosition;
 	position.xy += aInstancePosition;
-	
-	textCoords = vec2( aInstanceTextCoords.x,  aInstanceTextCoords.y ) + ciTexCoord0 * vec2( aInstanceTextCoords.z, aInstanceTextCoords.w );
 
+	vec4 imageCoords = uImageCoords[ aInstanceImageIndex ];
+	textCoords = vec2( imageCoords.x,  imageCoords.y ) + ciTexCoord0 * vec2( imageCoords.z, imageCoords.w );
+	
 	gl_Position = ciModelViewProjection * position;
 }
