@@ -9,6 +9,7 @@
 #include <boost/iostreams/device/array.hpp>
 #include <cinder/app/App.h>
 #include <cinder/app/RendererGl.h>
+#include <cinder/params/Params.h>
 #include <cinder/gl/gl.h>
 
 namespace io = boost::iostreams;
@@ -68,11 +69,15 @@ class CinderApp : public ci::app::App
 	{
 		try
 		{
+			_params = { "Parameters", ci::vec2( 200, 50 ) };
+			_params.addParam( "Sprites", &_instances ).min( 1 ).max( maxInstances );
+			_params.addParam( "Fps", &_averageFps, true );
+
 			const auto image = loadImage( loadResource( HERO_WALKING_IMG ) );
 			_animation = loadAnimation( image->getWidth(), image->getHeight() );
 			_texture = ci::gl::Texture2d::create( image );
 
-			std::vector< InstanceData > instances( instances );
+			std::vector< InstanceData > instances( maxInstances );
 			_instancesData = ci::gl::Vbo::create( GL_ARRAY_BUFFER, instances, GL_DYNAMIC_DRAW );
 
 			ci::geom::BufferLayout instanceDataLayout;
@@ -102,9 +107,10 @@ class CinderApp : public ci::app::App
 		const auto& frame = _animation.frames[ ( getElapsedFrames() / 8 ) % 4 ];
 
 		const auto instancesData = static_cast< InstanceData* >( _instancesData->mapReplace() );
-		for( auto& instanceData : boost::make_iterator_range( instancesData, instancesData + instances ) )
+		for( auto& instanceData : boost::make_iterator_range( instancesData, instancesData + _instances ) )
 			instanceData.textCoords = { frame.x, frame.y, frame.frame_width, frame.frame_height };
 		_instancesData->unmap();
+		_averageFps = getAverageFps();
 	}
 
 	virtual void draw() override
@@ -115,19 +121,22 @@ class CinderApp : public ci::app::App
 			ci::gl::ScopedTextureBind texture( _texture );
 			ci::gl::ScopedModelMatrix scpMtx;
 			ci::gl::translate( getWindowCenter() ),
-			_batch->drawInstanced( instances );
+			_batch->drawInstanced( _instances );
 		}
 
-		ci::gl::drawString( "Framerate: " + std::to_string( getAverageFps() ), ci::vec2( 0, 0 ) );
+		_params.draw();
 	}
 
 	ci::gl::Texture2dRef _texture;
 	ci::gl::VboRef _instancesData;
 	ci::gl::BatchRef _batch;
 	Animation _animation;
-	const int instances = 1000;
+	ci::params::InterfaceGl _params;
+	int _instances = 1000;
+	float _averageFps = 0.;
+	const int maxInstances = 10000;
 };
 
 }
 
-CINDER_APP( CinderApp, ci::app::RendererGl, []( ci::app::App::Settings* settings ){ settings->setResizable( false ); settings->setFrameRate( 60. ); } )
+CINDER_APP( CinderApp, ci::app::RendererGl, []( ci::app::App::Settings* settings ){ settings->setResizable( true ); settings->disableFrameRate(); } )
