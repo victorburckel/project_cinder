@@ -1,4 +1,4 @@
-#version 150
+#version 330 core
 
 uniform sampler2D uTex0;
 in vec2     textCoords;

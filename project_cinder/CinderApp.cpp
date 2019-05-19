@@ -42,8 +42,8 @@ Animation loadAnimation(int32_t imageWidth, int32_t imageHeight)
 {
     const auto res = ci::app::loadResource(HERO_WALKING_DAT);
 
-    io::basic_array_source<char> content(static_cast<char*>(res->getBuffer()->getData()), res->getBuffer()->getSize());
-    io::stream<io::basic_array_source<char>> is(content);
+    io::basic_array_source<char> content{static_cast<char*>(res->getBuffer()->getData()), res->getBuffer()->getSize()};
+    io::stream<io::basic_array_source<char>> is{content};
 
     bpt::ptree decoded;
     bpt::read_json(is, decoded);
@@ -58,7 +58,7 @@ Animation loadAnimation(int32_t imageWidth, int32_t imageHeight)
                                                     element.second.get<float>("frame_height") / imageHeight};
                         });
 
-    return Animation{animation.get<std::string>("name"), {frames.begin(), frames.end()}};
+    return {animation.get<std::string>("name"), {frames.begin(), frames.end()}};
 }
 
 class CinderApp: public ci::app::App
@@ -68,27 +68,25 @@ class CinderApp: public ci::app::App
         try
         {
             _params = {"Parameters", ci::vec2(200, 50)};
-            _params.addParam("Sprites", &_instances).min(1).max(maxInstances);
+            _params.addText("Device: " + ci::gl::getString(GL_RENDERER));
+            _params.addParam("Sprites", &_instances).min(static_cast<float>(1)).max(static_cast<float>(maxInstances));
             _params.addParam("Fps", &_averageFps, true);
 
             const auto image = loadImage(loadResource(HERO_WALKING_IMG));
             _animation = loadAnimation(image->getWidth(), image->getHeight());
             _texture = ci::gl::Texture2d::create(image);
 
-            std::vector<InstanceData> instances(maxInstances);
+            std::vector<InstanceData> instances{maxInstances};
             _instancesData = ci::gl::Vbo::create(GL_ARRAY_BUFFER, instances, GL_DYNAMIC_DRAW);
 
-            ci::geom::BufferLayout instanceDataLayout;
+            const ci::geom::BufferLayout instanceDataLayout{
+                {{ci::geom::Attrib::CUSTOM_0, ci::geom::DataType::FLOAT, 2, sizeof(InstanceData), offsetof(InstanceData, position), 1},
+                 {ci::geom::Attrib::CUSTOM_1, ci::geom::DataType::FLOAT, 4, sizeof(InstanceData), offsetof(InstanceData, textCoords), 1}}};
 
-            instanceDataLayout.append(ci::geom::Attrib::CUSTOM_0, 2, sizeof(InstanceData), offsetof(InstanceData, position), 1);
-            instanceDataLayout.append(ci::geom::Attrib::CUSTOM_1, 4, sizeof(InstanceData), offsetof(InstanceData, textCoords), 1);
-
-            const auto mesh = ci::gl::VboMesh::create(ci::geom::Rect(ci::Rectf(-37.5f, -50.f, 37.5f, 50.f)));
+            const auto mesh = ci::gl::VboMesh::create(ci::geom::Rect{ci::Rectf{-37.5f, -50.f, 37.5f, 50.f}});
             mesh->appendVbo(instanceDataLayout, _instancesData);
 
-            ci::gl::Batch::AttributeMapping mapping;
-            mapping[ci::geom::Attrib::CUSTOM_0] = "aInstancePosition";
-            mapping[ci::geom::Attrib::CUSTOM_1] = "aInstanceTextCoords";
+            const ci::gl::Batch::AttributeMapping mapping{{ci::geom::Attrib::CUSTOM_0, "aInstancePosition"}, {ci::geom::Attrib::CUSTOM_1, "aInstanceTextCoords"}};
 
             const auto shader = ci::gl::GlslProg::create(loadResource(VERTEX_SHADER), loadResource(FRAMGENT_SHADER));
             _batch = ci::gl::Batch::create(mesh, shader, mapping);
@@ -105,7 +103,7 @@ class CinderApp: public ci::app::App
         const auto& frame = _animation.frames[(getElapsedFrames() / 8) % 4];
 
         const auto instancesData = static_cast<InstanceData*>(_instancesData->mapReplace());
-        for (auto& instanceData: boost::make_iterator_range(instancesData, instancesData + _instances))
+        for (auto& instanceData: boost::make_iterator_range_n(instancesData, _instances))
             instanceData.textCoords = {frame.x, frame.y, frame.frame_width, frame.frame_height};
         _instancesData->unmap();
         _averageFps = getAverageFps();
@@ -116,9 +114,10 @@ class CinderApp: public ci::app::App
         ci::gl::clear(ci::Color(0.2f, 0.3f, 0.3f));
 
         {
-            ci::gl::ScopedTextureBind texture(_texture);
+            ci::gl::ScopedTextureBind texture{_texture};
             ci::gl::ScopedModelMatrix scpMtx;
-            ci::gl::translate(getWindowCenter()), _batch->drawInstanced(_instances);
+            ci::gl::translate(getWindowCenter());
+            _batch->drawInstanced(_instances);
         }
 
         _params.draw();
@@ -131,12 +130,12 @@ class CinderApp: public ci::app::App
     ci::params::InterfaceGl _params;
     int _instances = 1000;
     float _averageFps = 0.;
-    const int maxInstances = 10000;
+    static constexpr size_t maxInstances = 100000;
 };
 
 }
 
 CINDER_APP(CinderApp, ci::app::RendererGl, [](ci::app::App::Settings* settings) {
     settings->setResizable(true);
-    settings->disableFrameRate();
+    // settings->disableFrameRate();
 })
