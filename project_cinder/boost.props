@@ -8,7 +8,7 @@
       <AdditionalIncludeDirectories>..\..\vcpkg\installed\x64-windows\include</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
-      <AdditionalLibraryDirectories Condition="'$(Configuration)' == 'Release'">..\..\vcpkg\installed\x64-windows\lib\debug\lib</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories Condition="'$(Configuration)' == 'Debug'">..\..\vcpkg\installed\x64-windows\lib\debug\lib</AdditionalLibraryDirectories>
       <AdditionalLibraryDirectories Condition="'$(Configuration)' == 'Release'">..\..\vcpkg\installed\x64-windows\lib</AdditionalLibraryDirectories>
     </Link>
   </ItemDefinitionGroup>
